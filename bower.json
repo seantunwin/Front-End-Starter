@@ -1,0 +1,36 @@
+{
+  "name": "stu-ecrm",
+  "version": "0.0.1",
+  "description": "Elgin County Library Wordpress Project",
+  "main": "src/index.html",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "ecrm",
+    "foundation",
+    "jquery"
+  ],
+  "authors": [
+    "Sean T. Unwin"
+  ],
+  "license": "MIT",
+  "homepage": "www.ecrm5700.org",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "modernizr": "~2.8.3",
+    "backbone": "~1.1.2",
+    "underscore": "~1.7.0",
+    "foundation": "~5.4.7"
+  }
+}
