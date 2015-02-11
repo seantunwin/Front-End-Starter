@@ -4,13 +4,13 @@ Files and folders to help dive into your next project right away.
 
 ## Tools Used
 
-+ [npm](npmjs.com)
-+ [Gulp](gulpjs.com)
-+ [Bower](bower.io)
-+ [Sass](sass-lang.com)
-+ [Compass](compass-style.org)
-+ [Foundation](foundation.zurb.com)
-+ [LiveReload](livereload.com/)
++ [npm](https://npmjs.com)
++ [Gulp](http://gulpjs.com)
++ [Bower](http://bower.io)
++ [Sass](http://sass-lang.com)
++ [Compass](http://compass-style.org)
++ [Foundation](http://foundation.zurb.com)
++ [LiveReload](http://livereload.com/)
 
 ## Get Started
 
