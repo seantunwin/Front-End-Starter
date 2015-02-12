@@ -86,7 +86,7 @@ gulp.task('lint-js', function() {
 // Minify and gzip JS
 gulp.task('min-js', function() {
   var src = path.join(dirs.devDest, dirs.js),
-        dest = path.join(dirs.devDest, dirs.js, 'dist');
+        dest = path.join(dirs.devDest, dirs.js);
   return gulp.src([path.join(src, '**/*.js'), '!' + src + '**/*.min.js'])
     .pipe(plugins.plumber({
           errorHandler: function(error) {
@@ -94,9 +94,10 @@ gulp.task('min-js', function() {
             this.emit('end');
           }
       }))
-      .pipe(plugins.uglify.minify())
+      .pipe(plugins.uglify())
+      .pipe(plugins.rename({ suffix: '.min' }))
       .pipe(gulp.dest(dest))
-      .pipe(plugins.gzip(gzOPtions))
+      .pipe(plugins.gzip(gzOptions))
       .pipe(gulp.dest(dest))
 });
 
@@ -231,7 +232,7 @@ gulp.task('min-css', function() {
  // Optimize jpg
  gulp.task('images', function() {
     var src = path.join(dirs.devDest);
-    return gulp.src([path.joint(src, dirs.img, path.join(src, dirs.css, 'img')])
+    return gulp.src([path.join(src, dirs.img), path.join(src, dirs.css, 'img')])
         .pipe(plugins.imagemin())
         .pipe(gulp.dest(path.join(dirs.devDest, dirs.img)))
         .pipe(plugins.notify('Images Optimized'));
