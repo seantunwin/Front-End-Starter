@@ -23,6 +23,6 @@ When you're ready to start coding:
 + `gulp`
 
 ----------------------
-*[Licence](LICENCE.MD)*:  [WTFPL](http://www.wtfpl.net/)
+*[License](LICENSE)*:  [WTFPL](http://www.wtfpl.net/)
 
 
