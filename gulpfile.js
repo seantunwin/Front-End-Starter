@@ -54,7 +54,33 @@ var gzOptions = {
         level: 9
     }
 };
+
+// A filename that has been passed as a parameter
+//     -- see @function getFile
+var file = getFile();
+
 /* End Globals */
+
+
+/************************************
+ * Functions
+ ************************************/
+
+/**
+ * Get the file name if passed as parameter
+ * @description : Set a single file to use for gulp.src
+ *                          Useful for tasking this gulpfile
+ * @tutorial : gulp <task> [--file] [filename]
+ * @return {string} : filename to run task(s) on
+ **/
+function getFile() {
+    var args = process.argv.slice(2);
+    var flag = args[1];
+
+    // Return filename when flag is '--file' or undefined
+    return (flag && flag === '--file') ? args[2] : undefined;
+}
+/* End Functions */
 
 
 /************************************
@@ -65,8 +91,11 @@ var gzOptions = {
  *  JavaScript Tasks
  *******************************/
 
+// Combine JS tasks (lint and format)
+gulp.task('js', ['js:lint', 'js:pretty']);
+
 // Lint and format JS
-gulp.task('lint-js', function() {
+gulp.task('js:lint', function() {
   var src = path.join(dirs.devDest, dirs.js),
         dest = path.join(dirs.devDest, dirs.js);
   return gulp.src([path.join(src, '**/*.js'), '!' + src + '**/*.min.js'])
@@ -84,7 +113,7 @@ gulp.task('lint-js', function() {
 });
 
 // Minify and gzip JS
-gulp.task('min-js', function() {
+gulp.task('js:min', function() {
   var src = path.join(dirs.devDest, dirs.js),
         dest = path.join(dirs.devDest, dirs.js);
   return gulp.src([path.join(src, '**/*.js'), '!' + src + '**/*.min.js'])
@@ -102,7 +131,7 @@ gulp.task('min-js', function() {
 });
 
 // Copy Vendor JS Files
-gulp.task('cp-vendor-js', function() {
+gulp.task('js:cp-vendor', function() {
     var jsFiles = {
         modernizr: 'modernizr/modernizr.js',
         jquery: 'jquery/dist/**/*.min.js',
@@ -121,7 +150,7 @@ gulp.task('cp-vendor-js', function() {
 });
 
 // Tidy up Modernizr (minify, rename, delete pretty version)
-gulp.task('tidy-modernizr', ['cp-vendor-js'], function() {
+gulp.task('tidy-modernizr', ['js:cp-vendor'], function() {
     var src = path.join(dirs.devDest, dirs.js, 'modernizr.js');
 
     return gulp.src(src)
@@ -133,10 +162,10 @@ gulp.task('tidy-modernizr', ['cp-vendor-js'], function() {
 });
 
 // Perform: Copy Vendor JS
-gulp.task('copy-vendor-js', ['tidy-modernizr']);
+gulp.task('js:cp-vendor', ['tidy-modernizr']);
 
 // Bundle vendor js into one file
-gulp.task('bundle-js', ['copy-vendor-js'],  function() {
+gulp.task('bundle-js', ['js:cp-vendor'],  function() {
     var root = path.join(dirs.devDest, dirs.js);
     var jsList = ['modernizr.min.js', 'jquery.min.js'];
 
@@ -164,7 +193,7 @@ gulp.task('bundle-js', ['copy-vendor-js'],  function() {
         .pipe(gulp.dest(root))
         .pipe(plugins.gzip(gzOptions))
         .pipe(gulp.dest(root))
-        .pipe(plugins.notify('Bundled and deleted old files'));
+        .pipe(plugins.notify('Bundled JavaScript files'));
 });
 /* End JavaScript Tasks */
 
@@ -172,9 +201,20 @@ gulp.task('bundle-js', ['copy-vendor-js'],  function() {
  * Sass/Css Tasks
  * *****************************/
 
+// Copy Foundation Sass import and settings files to scss/vendor/
+gulp.task('cp:foundation', function() {
+  var src = [
+    './bower_components/foundation/scss/foundation/_settings.scss',
+    './bower_components/foundation/scss/foundation.scss'
+  ];
+  var dest = path.join(dirs.devDest, dirs.sass, 'vendor/foundation/');
+  return gulp.src(src)
+      .pipe(gulp.dest(dest));
+});
+
 // Styles Task
 // Combine and minify Sass/Compass stylesheets
-gulp.task('styles', function() {
+gulp.task('css:styles', function() {
   var style = 'expanded'; // options: nested, compact, expanded
   return gulp.src(path.join(dirs.devDest, dirs.sass, 'main.scss'))
       .pipe(plugins.plumber({
@@ -197,7 +237,7 @@ gulp.task('styles', function() {
 });
 
 // Remove unused CSS
-gulp.task('uncss', function() {
+gulp.task('css:uncss', function() {
     return gulp.src(path.join(dirs.devDest, dirs.css, 'main.css'))
         .pipe(plugins.uncss({
             html: [path.join(dirs.devDest, '**/*.html')]
@@ -206,7 +246,7 @@ gulp.task('uncss', function() {
 });
 
 // Minify vendor CSS
-gulp.task('min-css', function() {
+gulp.task('css:min', function() {
   return gulp.src(path.join(dirs.devDest, dirs.css, '*.css'))
       .pipe(plugins.plumber({
           errorHandler: function(error) {
@@ -230,7 +270,7 @@ gulp.task('min-css', function() {
  *******************************/
 
  // Optimize jpg
- gulp.task('images', function() {
+ gulp.task('img:min', function() {
     var src = path.join(dirs.devDest);
     return gulp.src([path.join(src, dirs.img), path.join(src, dirs.css, 'img')])
         .pipe(plugins.imagemin())
@@ -262,7 +302,7 @@ gulp.task('watch',['connect'], function() {
     gulp.watch([path.join(dirs.devDest, '**/*.html')], ['html']);
     gulp.watch(path.join(dirs.devDest, dirs.sass, '**/*.scss'), ['styles']);
     // gulp.watch(path.join(dirs.devDest, dirs.css, 'main.css'), ['uncss']);
-    gulp.watch(path.join(dirs.devDest, dirs.js, '**/*.js'), ['lint-js']);
+    gulp.watch(path.join(dirs.devDest, dirs.js, '**/*.js'), ['js']);
 });
 
 // Default Task

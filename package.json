@@ -1,16 +1,14 @@
 {
-  "name": "stu-ecrm",
+  "name": "stu-front-end-starter",
   "version": "0.0.1",
-  "description": "Elgin County Library Wordpress Project",
+  "description": "Start up files for a front-end project",
   "main": "gulpfile.js",
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "ecrm",
-    "foundation",
-    "jquery"
+
   ],
   "author": "Sean T. Unwin",
   "license": "MIT",
