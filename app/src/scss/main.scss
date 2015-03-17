@@ -1,0 +1,27 @@
+@charset "UTF-8";
+
+
+@import "utils/helpers/units";
+@import "utils/functions";
+@import "utils/mixins";
+@import "utils/variables";
+
+// Foundation
+@import "vendor/foundation/settings";
+@import "vendor/foundation/foundation";
+
+@import "base/fonts";
+@import "base/base";
+@import "layout/layout";
+@import "layout/header";
+@import "layout/footer";
+
+ // Add your components here
+// @import "components/widget";
+
+ // Add your page partials here
+// @import "pages/mypage";
+
+
+// @import "fonts/icomoon"; // Add your icomoon, fontawesome, etc files here
+// @import "layout/mediaqueries"; // Uncomment if you keep media queries separate

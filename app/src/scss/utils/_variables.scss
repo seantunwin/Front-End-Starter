@@ -1,0 +1,44 @@
+//************************************
+//*                     BASE                    *
+//************************************/
+
+$rem-base: 16px;
+
+//************************************
+//*                COLOURS                 *
+//************************************/
+
+$color-white: #efefef; // white
+$color-charcoal: #444444; // grey (dark)
+$color-alpha: #840a0a; // red
+$color-beta: #dfdeb1; // sawdust
+$color-gamma: #2c633e; // green
+$color-delta: #12a7cc; // blue
+$color-epsilon: #e6daff; // purple (light)
+$color-digamma: #ddc23b; // gold
+$color-zeta: #334433; // green (dark)
+$color-eta: #2c0505; // black-cherry
+
+//************************************
+//*                  LAYOUT                   *
+//************************************/
+
+$max-view-width: 980px;
+$header-height: 75px;
+
+
+//************************************
+//*                SCREENS                 *
+//************************************/
+
+$breakpoints: (
+  small: "(max-width: 40em)",
+  medium: "(max-width: 50em)",
+  large: "(min-width: 52.5em)"
+);
+
+//************************************
+//*                HEADER                 *
+//************************************/
+
+$header-bgcolor-alpha: $color-white;

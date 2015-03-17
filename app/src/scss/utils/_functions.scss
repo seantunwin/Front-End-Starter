@@ -1,0 +1,22 @@
+/// Map deep get
+/// @author Hugo Giraudel
+/// @access public
+/// @param {Map} $map - Map
+/// @param {Arglist} $keys - Key chain
+/// @return {*} - Desired value
+@function map-deep-get($map, $keys...) {
+    @each $key in $keys {
+        $map: map-get($map, $key);
+    }
+    @return $map;
+}
+
+@function calculate-rem($size) {
+  $rem-size: 0;
+  @if $rem-base != null and $rem-base != 16px {
+    $rem-size: $size / $rem-base;
+  } @else {
+    $rem-size: $size / 16px;
+  }
+  @return $rem-size * 1rem;
+}

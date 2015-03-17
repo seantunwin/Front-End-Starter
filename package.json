@@ -7,24 +7,22 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [
-
-  ],
+  "keywords": [],
   "author": "Sean T. Unwin",
-  "license": "MIT",
+  "license": "WTFPL",
   "devDependencies": {
     "del": "^0.1.3",
-    "gulp": "^3.8.10",
+    "gulp": "^3.8.11",
     "gulp-autoprefixer": "^2.0.0",
-    "gulp-clean": "^0.3.1",
+    "gulp-changed": "^1.2.1",
     "gulp-compass": "^2.0.2",
     "gulp-concat": "^2.4.1",
     "gulp-connect": "^2.2.0",
     "gulp-filter": "^1.0.2",
     "gulp-gzip": "0.0.8",
     "gulp-imagemin": "^2.0.0",
-    "gulp-jshint": "^1.9.0",
     "gulp-js-prettify": "^0.1.0",
+    "gulp-jshint": "^1.9.0",
     "gulp-load-plugins": "^0.7.1",
     "gulp-minify-css": "^0.3.11",
     "gulp-notify": "^2.0.1",
@@ -34,7 +32,6 @@
     "gulp-svgmin": "^0.4.8",
     "gulp-uglify": "^1.0.1",
     "gulp-uncss": "^0.5.1",
-    "imagemin-jpegoptim": "^4.0.0",
-    "main-bower-files": "^2.4.0"
+    "imagemin-jpegoptim": "^4.0.0"
   }
 }

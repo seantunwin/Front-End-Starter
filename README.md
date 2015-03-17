@@ -1,6 +1,7 @@
 # Front-End Starter
 
-Files and folders to help dive into your next project right away.
+Directory structure and templates to help diving into your next project right away.
+
 
 ## Tools Used
 
@@ -20,7 +21,9 @@ While in the root folder:
 
 When you're ready to start coding:
 
-+ `gulp`
++ `gulp setup` (first-time only) then `gulp` to begin
+    + this will copy vendor JS and Sass files to dev directory tree
++ Start editing/creating your project in `app/src`
 
 ----------------------
 *[License](LICENSE)*:  [WTFPL](http://www.wtfpl.net/)

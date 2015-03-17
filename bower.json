@@ -1,7 +1,7 @@
 {
-  "name": "stu-ecrm",
+  "name": "stu-front-end-starter",
   "version": "0.0.1",
-  "description": "Elgin County Library Wordpress Project",
+  "description": "Start up files for a front-end project",
   "main": "src/index.html",
   "moduleType": [
     "amd",
@@ -9,15 +9,13 @@
     "node"
   ],
   "keywords": [
-    "ecrm",
-    "foundation",
-    "jquery"
+
   ],
   "authors": [
     "Sean T. Unwin"
   ],
-  "license": "MIT",
-  "homepage": "www.ecrm5700.org",
+  "license": "WTFPL",
+  "homepage": "https://github.com/seantunwin/front-end-starter",
   "private": true,
   "ignore": [
     "**/.*",

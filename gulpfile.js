@@ -11,16 +11,17 @@ var path = require('path');
 
 // Include plugins
 var plugins = require('gulp-load-plugins')({
-    pattern: ['gulp-*', 'gulp.*', 'main-bower-files', 'del'],
+    pattern: ['gulp-*', 'gulp.*', 'del', 'replace'],
     replaceString: /\bgulp[\-.]/
 });
 
 // Define directory paths
 var dirs = {
     root: __dirname + './',
+    app: path.join(__dirname, 'app'),
     bower: './bower_components',
-    devDest: './src',
-    prodDest: './dist',
+    dev: path.join(__dirname, 'app', 'src'),
+    prod: path.join(__dirname, 'app', 'dist'),
     js: 'js',
     sass: 'scss',
     css: 'css',
@@ -29,23 +30,23 @@ var dirs = {
 
 // Define beautifier options
 var prettifyOpts = {
-    "indent_size": 2,
-    "indent_char": " ",
-    "indent_level": 0,
-    "indent_with_tabs": false,
-    "preserve_newlines": true,
-    "max_preserve_newlines": 10,
-    "jslint_happy": false,
-    "space_after_anon_function": false,
-    "brace_style": "collapse",
-    "keep_array_indentation": true,
-    "keep_function_indentation": true,
-    "space_before_conditional": true,
-    "break_chained_methods": false,
-    "eval_code": false,
-    "unescape_strings": false,
-    "wrap_line_length": 0
-}
+    'indent_size': 2,
+    'indent_char': ' ',
+    'indent_level': 0,
+    'indent_with_tabs': false,
+    'preserve_newlines': true,
+    'max_preserve_newlines': 10,
+    'jslint_happy': false,
+    'space_after_anon_function': false,
+    'brace_style': 'collapse',
+    'keep_array_indentation': true,
+    'keep_function_indentation': true,
+    'space_before_conditional': true,
+    'break_chained_methods': false,
+    'eval_code': false,
+    'unescape_strings': false,
+    'wrap_line_length': 0
+};
 
 // Define gzip options
 var gzOptions = {
@@ -88,50 +89,15 @@ function getFile() {
  ************************************/
 
 /**
- *  JavaScript Tasks
+ *  Setup Tasks
  *******************************/
 
-// Combine JS tasks (lint and format)
-gulp.task('js', ['js:lint', 'js:pretty']);
-
-// Lint and format JS
-gulp.task('js:lint', function() {
-  var src = path.join(dirs.devDest, dirs.js),
-        dest = path.join(dirs.devDest, dirs.js);
-  return gulp.src([path.join(src, '**/*.js'), '!' + src + '**/*.min.js'])
-    .pipe(plugins.plumber({
-          errorHandler: function(error) {
-            console.log(error.message);
-            this.emit('end');
-          }
-      }))
-    .pipe(plugins.jshint())
-    .pipe(plugins.jsPrettify(prettifyOpts))
-    .pipe(gulp.dest(dest))
-    .pipe(plugins.connect.reload())
-    .pipe(plugins.notify('JavaScript has been formatted'));
-});
-
-// Minify and gzip JS
-gulp.task('js:min', function() {
-  var src = path.join(dirs.devDest, dirs.js),
-        dest = path.join(dirs.devDest, dirs.js);
-  return gulp.src([path.join(src, '**/*.js'), '!' + src + '**/*.min.js'])
-    .pipe(plugins.plumber({
-          errorHandler: function(error) {
-            console.log(error.message);
-            this.emit('end');
-          }
-      }))
-      .pipe(plugins.uglify())
-      .pipe(plugins.rename({ suffix: '.min' }))
-      .pipe(gulp.dest(dest))
-      .pipe(plugins.gzip(gzOptions))
-      .pipe(gulp.dest(dest))
-});
+// Complete project creation
+//     - copy vendor imports to dev directory
+gulp.task('setup', ['cp:js-vendor', 'cp:sass-foundation']);
 
 // Copy Vendor JS Files
-gulp.task('js:cp-vendor', function() {
+gulp.task('cp:js-vendor', function() {
     var jsFiles = {
         modernizr: 'modernizr/modernizr.js',
         jquery: 'jquery/dist/**/*.min.js',
@@ -145,29 +111,101 @@ gulp.task('js:cp-vendor', function() {
     ];
 
     return gulp.src(jsPaths)
-    .pipe(gulp.dest(path.join(dirs.devDest, dirs.js)))
-    .pipe(plugins.notify('Files copied'));
+    .pipe(plugins.plumber({
+          errorHandler: function(error) {
+            console.log(error.message);
+            this.emit('end');
+          }
+      }))
+    .pipe(gulp.dest(path.join(dirs.dev, dirs.js)))
+    .pipe(plugins.notify('JS vendor files copied'));
 });
 
-// Tidy up Modernizr (minify, rename, delete pretty version)
-gulp.task('tidy-modernizr', ['js:cp-vendor'], function() {
-    var src = path.join(dirs.devDest, dirs.js, 'modernizr.js');
+// Copy Foundation Sass import and settings files to scss/vendor/
+gulp.task('cp:sass-foundation', function() {
+  var src = [
+    './bower_components/foundation/scss/foundation/_settings.scss',
+    './bower_components/foundation/scss/foundation.scss'
+  ];
+  var dest = path.join(dirs.dev, dirs.sass, 'vendor/foundation/');
 
+  return gulp.src(src)
+      .pipe(gulp.dest(dest))
+      .pipe(plugins.notify('Foundation Sass files copied'));
+});
+
+
+/**
+ *  JavaScript Tasks
+ *******************************/
+
+// Combine JS tasks (lint and format)
+gulp.task('js', ['js:lint', 'js:pretty']);
+
+// Lint JS
+gulp.task('js:lint', function() {
+  var srcPath = path.join(dirs.dev, dirs.js),
+        src = file || [path.join(srcPath, '**/*.js') ,'!' + srcPath + '**/*.min.js'],
+        dest = path.join(srcPath);
+
+  console.log('file: ' + file);
+  return gulp.src([path.join(src, '**/*.js'), '!' + src + '**/*.min.js'])
+    .pipe(plugins.plumber({
+          errorHandler: function(error) {
+            console.log(error.message);
+            this.emit('end');
+          }
+      }))
+    .pipe(plugins.changed(dest))
+    .pipe(plugins.jshint())
+    .pipe(plugins.jshint.reporter('jshint-stylish'))
+    // .pipe(plugins.jsPrettify(prettifyOpts))
+    .pipe(gulp.dest(dest))
+    // .pipe(plugins.connect.reload())
+    .pipe(plugins.notify('JavaScript has been linted'));
+});
+
+// Format JS
+gulp.task('js:pretty', function() {
+  var src = path.join(dirs.dev, dirs.js);
     return gulp.src(src)
-    .pipe(plugins.clean())
-    .pipe(plugins.uglify())
-    .pipe(plugins.rename({ suffix: '.min'}))
-    .pipe(gulp.dest(path.join(dirs.devDest, dirs.js)))
-    .pipe(plugins.notify('File renamed'));
+        .pipe(plugins.plumber({
+            errorHandler: function(error) {
+                console.log(error.message);
+                this.emit('end');
+            }
+        }))
+        .pipe(plugins.changed(src))
+        .pipe(plugins.jsPrettify(prettifyOpts))
+        .pipe(gulp.dest(src))
+        .pipe(plugins.notify('JavaScript has been formatted'));
 });
 
-// Perform: Copy Vendor JS
-gulp.task('js:cp-vendor', ['tidy-modernizr']);
+// Minify and gzip JS
+gulp.task('js:min', function() {
+  var src = path.join(dirs.dev, dirs.js),
+        dest = path.join(dirs.dev, dirs.js);
+
+  return gulp.src([path.join(src, '**/*.js'), '!' + src + '**/*.min.js'])
+    .pipe(plugins.plumber({
+          errorHandler: function(error) {
+            console.log(error.message);
+            this.emit('end');
+          }
+      }))
+      .pipe(plugins.uglify())
+      .pipe(plugins.rename({ suffix: '.min' }))
+      .pipe(gulp.dest(dest))
+      .pipe(plugins.gzip(gzOptions))
+      .pipe(gulp.dest(dest));
+});
+
 
 // Bundle vendor js into one file
-gulp.task('bundle-js', ['js:cp-vendor'],  function() {
-    var root = path.join(dirs.devDest, dirs.js);
-    var jsList = ['modernizr.min.js', 'jquery.min.js'];
+gulp.task('bundle-js',  function() {
+    var root = path.join(dirs.dev, dirs.js);
+    // List dependcies first
+    var jsList = ['foundation.min.js', 'jquery.min.js'];
 
     function addPathToFiles(files) {
         var i = 0;
@@ -197,26 +235,18 @@ gulp.task('bundle-js', ['js:cp-vendor'],  function() {
 });
 /* End JavaScript Tasks */
 
+
 /**
  * Sass/Css Tasks
  * *****************************/
 
-// Copy Foundation Sass import and settings files to scss/vendor/
-gulp.task('cp:foundation', function() {
-  var src = [
-    './bower_components/foundation/scss/foundation/_settings.scss',
-    './bower_components/foundation/scss/foundation.scss'
-  ];
-  var dest = path.join(dirs.devDest, dirs.sass, 'vendor/foundation/');
-  return gulp.src(src)
-      .pipe(gulp.dest(dest));
-});
-
 // Styles Task
-// Combine and minify Sass/Compass stylesheets
+// Compile Sass to CSS
 gulp.task('css:styles', function() {
+  // Set compile style
   var style = 'expanded'; // options: nested, compact, expanded
-  return gulp.src(path.join(dirs.devDest, dirs.sass, 'main.scss'))
+
+  return gulp.src(path.join(dirs.dev, dirs.sass, 'main.scss'))
       .pipe(plugins.plumber({
             errorHandler: function (error) {
             console.log(error.message);
@@ -224,30 +254,30 @@ gulp.task('css:styles', function() {
       }}))
       .pipe(plugins.compass({
             config_file: './config.rb',
-            css: path.join(dirs.devDest, dirs.css),
-            sass: path.join(dirs.devDest, dirs.sass),
+            css: path.join(dirs.dev, dirs.css),
+            sass: path.join(dirs.dev, dirs.sass),
             style: style
       }))
       .pipe(plugins.autoprefixer({
                 browsers: ['last 2 versions']
       }))
-      .pipe(gulp.dest(path.join(dirs.devDest, dirs.css)))
-      .pipe(plugins.connect.reload())
+      .pipe(gulp.dest(path.join(dirs.dev, dirs.css)))
+      // .pipe(plugins.connect.reload())
       .pipe(plugins.notify('Compiled: SCSS --> CSS (' + style + ')'));
 });
 
 // Remove unused CSS
 gulp.task('css:uncss', function() {
-    return gulp.src(path.join(dirs.devDest, dirs.css, 'main.css'))
+    return gulp.src(path.join(dirs.dev, dirs.css, 'main.css'))
         .pipe(plugins.uncss({
-            html: [path.join(dirs.devDest, '**/*.html')]
+            html: [path.join(dirs.dev, '**/*.html')]
         }))
-        .pipe(gulp.dest(path.join(dirs.devDest, dirs.css)));
+        .pipe(gulp.dest(path.join(dirs.dev, dirs.css)));
 });
 
 // Minify vendor CSS
 gulp.task('css:min', function() {
-  return gulp.src(path.join(dirs.devDest, dirs.css, '*.css'))
+  return gulp.src(path.join(dirs.dev, dirs.css, '*.css'))
       .pipe(plugins.plumber({
           errorHandler: function(error) {
             console.log(error.message);
@@ -259,9 +289,9 @@ gulp.task('css:min', function() {
             roundingPrecision: -1,
             shorthandCompacting: false
       }))
-      .pipe(gulp.dest(path.join(dirs.devDest, dirs.css)))
+      .pipe(gulp.dest(path.join(dirs.dev, dirs.css)))
       .pipe(plugins.gzip(gzOptions))
-      .pipe(gulp.dest(path.join(dirs.devDest, dirs.css)))
+      .pipe(gulp.dest(path.join(dirs.dev, dirs.css)));
   });
 
 
@@ -271,12 +301,37 @@ gulp.task('css:min', function() {
 
  // Optimize jpg
  gulp.task('img:min', function() {
-    var src = path.join(dirs.devDest);
+    var src = path.join(dirs.dev);
+
     return gulp.src([path.join(src, dirs.img), path.join(src, dirs.css, 'img')])
         .pipe(plugins.imagemin())
-        .pipe(gulp.dest(path.join(dirs.devDest, dirs.img)))
+        .pipe(gulp.dest(path.join(dirs.dev, dirs.img)))
         .pipe(plugins.notify('Images Optimized'));
  });
+
+/**
+ *  Build Tasks
+ *******************************/
+
+ // GZip JS and CSS
+ gulp.task('zipem', function() {
+  // src: Source path array
+  //     - not path ('!') is to exclude existing .gz and .map files
+  var src= [
+          path.join(dirs.prod, dirs.css, '**/*.css'),
+          '!' + path.join(dirs.prod, dirs.css, '**/*.css.*'),
+          path.join(dirs.prod, dirs.js, '**/*.js'),
+          '!' + path.join(dirs.prod, dirs.js,'**/*.js.*')
+        ];
+
+  // dest: Destination path array
+  var dest = dirs.prod;
+
+  return gulp.src(src)
+      .pipe(plugins.gzip(gzOptions))
+      .pipe(gulp.dest(dest));
+ });
+
 
 /**
  *  Server & Watch Tasks
@@ -285,24 +340,24 @@ gulp.task('css:min', function() {
 // Create server with livereload
 gulp.task('connect', function() {
     plugins.connect.server({
-        root: dirs.devDest,
+        root: dirs.dev,
         livereload: true
     });
 });
 
 // Reload on html file change
 gulp.task('html', function() {
-    return gulp.src(path.join(dirs.devDest,'**/*.html'))
+    return gulp.src(path.join(dirs.dev,'**/*.html'))
     .pipe(plugins.notify('HTML has been saved'))
     .pipe(plugins.connect.reload());
 });
 
 // Watch HTML Task
 gulp.task('watch',['connect'], function() {
-    gulp.watch([path.join(dirs.devDest, '**/*.html')], ['html']);
-    gulp.watch(path.join(dirs.devDest, dirs.sass, '**/*.scss'), ['styles']);
-    // gulp.watch(path.join(dirs.devDest, dirs.css, 'main.css'), ['uncss']);
-    gulp.watch(path.join(dirs.devDest, dirs.js, '**/*.js'), ['js']);
+    gulp.watch([path.join(dirs.dev, '**/*.html')], ['html']);
+    gulp.watch(path.join(dirs.dev, dirs.sass, '**/*.scss'), ['css:styles']);
+    // gulp.watch(path.join(dirs.dev, dirs.css, 'main.css'), ['uncss']);
+    gulp.watch(path.join(dirs.dev, dirs.js, '**/*.js'), ['js']);
 });
 
 // Default Task
